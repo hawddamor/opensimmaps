@@ -3,14 +3,15 @@
  	<head>
    		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     	<title>World Map</title>
-		<script type="text/javascript" src="http://maps.google.com/maps?file=api&sensor=false&v=2&key=AIzaSyBACCLjQjfliUdoyI90ZS5HNf7M22TYORI"></script>
+		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&v=3&key=AIzaSyBACCLjQjfliUdoyI90ZS5HNf7M22TYORI"></script>
     	<script type="text/javascript" src="url.js"></script>
+        <script type="text/javascript" src="copyright.js"></script>
     	<link rel="stylesheet" type="text/css" href="style.css" />
 
 	</head>
  	<body onload="load()" onunload="GUnload()">
 		<div id="content">
-			<table><tr><td align="center"><div id="map" style="width:100%;height:100%;"></div></td></tr></table>
+			<table><tr><td align="center"><div id="map-canvas" style="width:100%;height:100%;"></div></td></tr></table>
 		</div>
   </body>
 </html>

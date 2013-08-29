@@ -1,0 +1,52 @@
+Edit the file url.js and change the settings at the top, being careful not to alter the code itself.
+
+There are several other things you can do to improve how this works with your OpenSim instance.
+
+(1) On a Linux/Unix/Solaris server, try making soft links from your [opensim]/bin/maptiles folder to your [google_map]/data/region 
+folder, substituting the path name for [opensim] and [google_map], wherever these are on your server, and the grid coordinates for 
+[x] and [y]. This will prevent you from having to manually import the maptiles into the folder, with the added bonus that they will 
+be updated automatically. You will need one for each of the regions, and will need to add others each time you add regions. You should 
+ignore any files starting in map-2- or more, as only the map-1- files are on the correct zoom level. Filenames in [opensim]/bin/maptiles 
+that are in the form [UUID].jpg are not local regions on your server, so you should not use these (you must have visited these by 
+hypergrid, if they exist). You should use the syntax:
+
+ln -s [opensim]/bin/maptiles/map-1-[x]-[y]-objects.jpg [google_map]/data/regions/maptiles/map-1-[x]-[y]-objects.jpg
+
+e.g. ln -s /opt/opensim/bin/maptiles/map-1-1000-1000-objects.jpg /var/www/opensim/app/google_map/data/regions/maptiles/map-1-1000-1000-objects.jpg
+
+It would be possible to script this automatically if you parsed the XML output of [google_map]/data/map.php. If you have a great deal of 
+regions, especially if people other than you add them or remove them frequently, this might be desirable - it's otherwise unnecessary.
+
+Note that this will only work if you use the option var <code> filenames = "opensim"; </code> instead of <code> var filenames = "uuid"; 
+</code> or <code> var filenames = "uuid-no-dashes"; </code> in the settings. (Note that the tags <code> and </code> are just used here 
+for clarity and don't appear in the file!)
+
+(2) Use the module Warp3DImageModule rather than MapImageModule. You actually need these settings under [Startup] in OpenSim.ini (as of 
+OpenSim 0.7.3.1) - the quotation marks may or may not be critical. Some may already be set in OpenSimDefaults.ini, which you should NOT 
+change. If you wish to change settings, copy the lines to the correct sections in OpenSim.ini and change them there:
+
+MapImageModule = "Warp3DImageModule"
+TextureOnMapTile = true
+DrawPrimOnMapTile = true
+
+(See http://opensimulator.org/wiki/Warp3DImageModule for further details.)
+
+This will dramatically improve the quality of your map tiles but some people have reported that it places excessive demands on memory. It 
+is likely that this will depend on the specifications of your server. Check the OpenSim Mantis (http://opensimulator.org/mantis/main_page.php) 
+if you have a problem, as someone else may have had it before and you shouldn't duplicate error reports. Likely they are working on it :-)
+
+(3) Notice that, unlike the previous version, you can add multiple map centres (see the settings in url.js), which can even be on different 
+servers, providing of course that you have local copies of maptiles or can fetch them somehow from any remote servers when you need to (for 
+example, it would be possible to do this automatically using scp or similar if you needed to script this for a large grid, updating at 
+intervals using a cron job, for example, on a Linux/Unix/Solaris server). You should be able to have quite a lot, if you *really* need to! ;-)
+
+This opens the way for people to run grids where not all of the regions are in the same general area of the grid, as you can now see them on 
+your world map (although you could always do this if you didn't worry about seeing them on your web site). This is useful, for example, 
+if you want to make hypergrid jumps avoiding the 4096 region maximum distance bug in the viewer code. Rather than jumping via an external 
+intermediary grid in a known middle location, it's much more reliable and predictable to be able to do it in your own home grid. You could 
+maybe have one set of regions near (7000,7000) and more somewhere like (4000,4000) and you'd be able to reach most other grids. It's probably 
+never a good idea to choose x and y coordinates separated by more than 4096, e.g. (10000,3000) and it's normal practice to choose roughly 
+equal values, especially for the ones you think of as your "home" or "arrival" regions.
+
+Perhaps you have more than one grid, or you have regions on more than one large public grid like OSGrid, FrancoGrid etc? Now you can put them 
+on your own map, at different map centres, providing that you have the map tiles (256 x 256px) available :-)

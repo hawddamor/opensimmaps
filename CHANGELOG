@@ -1,0 +1,26 @@
+Google maps API v3 interface for OpenSim. (See demo at http://talatchaudhri.com/demo/opensimmaps/v3/)
+Based on pre-existing (2008) Google maps API v2 interface for OpenSim. (See demo at http://talatchaudhri.com/demo/opensimmaps/v2/)
+
+Given that GMaps v2 is deprecated and will be withdrawn in 2013, upgraded to v3. As the v3 API is radically different, only a core of the code was portable, so wrote substantial new replacement code.
+
+Various bug fixes and maintenance e.g. map centre, local defaults, links and link protocols.
+Re-wrote the info window script and added a draggable/clickable marker, limited within map tile boundaries.
+Added multiple centre locations and/or servers.
+Added multiple map data copyright support for multiple servers.
+Added home button functionality missing in GMaps v3 controls.
+Added more configurable user settings than previously added to v2 version.
+Added: user setting for initial zoom size.
+Support for uuid-based and opensim-based tile filenames (can update automatically from OpenSim server).
+Created fake PHP5 DOM script returning XML to enable test instance independent of OpenSim server live XML.
+Back-ported DOM script to PHP4 (using older php_domxml) so it can run on PHP4.
+Fixed: minor marker setup bug.
+Cleaned up code and added comments for documentation.
+Added README.
+Unfixable (minor): marker hover incorrect on drag if not moved off marker and returned: no JS solution, apparently a browser issue.
+
+To do (features):
+add switchable grid map background with grid locations (& sort out how background is done)
+move set up user settings into XML and use parser to initialise
+
+Code base last modified: 2012-07-30
+This change log last modified: 2012-08-29

@@ -1,8 +1,15 @@
 <?php
-//Creates XML string and XML document using the DOM 
-$dom = new DomDocument('1.0', "UTF-8"); 
+// Creates XML string and XML document using the DOM
+// PHP4 version
+$dom = domxml_new_doc('1.0'); 
 
-$map = $dom->appendChild($dom->createElement('Map'));$test1 = $dom->saveXML(); // put string in test1 
+$map = $dom->create_element('root');
+$map = $dom->append_child($map);
+
+$test1 = $dom->create_element('Map');
+$test1 = $map->append_child($test1);
+
+$test1 = $dom->dump_mem(true); // put string in test1 
 $test1 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <Map>
   <Grid>
