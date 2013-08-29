@@ -23,4 +23,4 @@ add switchable grid map background with grid locations (& sort out how backgroun
 move set up user settings into XML and use parser to initialise
 
 Code base last modified: 2012-07-30
-This change log last modified: 2012-08-29
+This change log last modified: 2013-08-29
