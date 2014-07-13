@@ -40,13 +40,14 @@ servers, providing of course that you have local copies of maptiles or can fetch
 example, it would be possible to do this automatically using scp or similar if you needed to script this for a large grid, updating at 
 intervals using a cron job, for example, on a Linux/Unix/Solaris server). You should be able to have quite a lot, if you *really* need to! ;-)
 
-This opens the way for people to run grids where not all of the regions are in the same general area of the grid, as you can now see them on 
-your world map (although you could always do this if you didn't worry about seeing them on your web site). This is useful, for example, 
-if you want to make hypergrid jumps avoiding the 4096 region maximum distance bug in the viewer code. Rather than jumping via an external 
-intermediary grid in a known middle location, it's much more reliable and predictable to be able to do it in your own home grid. You could 
-maybe have one set of regions near (7000,7000) and more somewhere like (4000,4000) and you'd be able to reach most other grids. It's probably 
-never a good idea to choose x and y coordinates separated by more than 4096, e.g. (10000,3000) and it's normal practice to choose roughly 
-equal values, especially for the ones you think of as your "home" or "arrival" regions.
+This opens the way for people to run grids where not all of the regions are in the same general area of the grid, as you can now see them on
+your world map (although you could always do this if you didn't worry about seeing them on your web site). This is useful, for example,
+if you want to make hypergrid jumps avoiding the 4096 region maximum distance bug in the viewer code. Rather than jumping via an external
+intermediary grid in a known middle location, it's much more reliable and predictable to be able to do it in your own home grid. You could
+maybe have one set of regions near (7000,7000) and more somewhere like (4000,4000) and you'd be able to reach most other grids. It was formerly 
+a bad idea to choose x and y coordinates separated by more than 4096, e.g. (10000,3000), but this may only be an issue for older viewers.
+
+The new code in 2014 makes a number of minor improvements as well as the major new rewrite to support larger regions e.g. varregions etc.
 
 Perhaps you have more than one grid, or you have regions on more than one large public grid like OSGrid, FrancoGrid etc? Now you can put them 
 on your own map, at different map centres, providing that you have the map tiles (256 x 256px) available :-)

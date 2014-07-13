@@ -17,10 +17,15 @@ Fixed: minor marker setup bug.
 Cleaned up code and added comments for documentation.
 Added README.
 Unfixable (minor): marker hover incorrect on drag if not moved off marker and returned: no JS solution, apparently a browser issue.
+Re-wrote to support large regions e.g. varregions in OpenSim/Aurora/WhiteCore
+Added offsets from map centre
+Improved home centering per map centre
+Added zoom levels for each  map centre
+Added automatic copyright start/end years
 
 To do (features):
 add switchable grid map background with grid locations (& sort out how background is done)
 move set up user settings into XML and use parser to initialise
 
-Code base last modified: 2012-07-30
-This change log last modified: 2013-08-29
+Code base last modified: 2014-07-12
+This change log last modified: 2014-07-13

@@ -1,6 +1,9 @@
-// Copyright 2012 donated to OSGrid.org, see http://forge.opensimulator.org/gf/project/opensimwi/ for details of software licence.
+// Copyright 2012-14 donated to OSGrid.org, under BSD licence, see http://forge.opensimulator.org/gf/project/opensimwi/ for details.
 // This code updates the Google Maps module found there from API v2 to API v3, but can be used without the OpenSim Web Interface. It also
 // adds new functionality e.g. new hypergrid teleport formats and multiple map centres and/or multiple grids. It also has a draggable marker.
+
+// Copyright 2014 donated to OSGrid.org added new features such as support for large regions e.g. varregions in OpenSim/WhiteCore/Aurora, 
+// offsets from map centre, zoom levels for each  map centre, automatic copyright start/end years, better home centering per map centre.
 
 // ########## GRID SPECIFIC VARIABLES, CHANGE THESE AS REQUIRED ##########
 
@@ -19,12 +22,34 @@ var xlocations = {
 
 var ylocations = {
   "world1": 10000, // primary map centre location (y)
-  "world2": 4999, // secondary map centre location (y)
+  "world2": 5000, // secondary map centre location (y)
+  // ... add more lines as required, separated by commas, same index labels as above
+};
+
+// ## This is especially useful for large regions e.g. varregions ##
+var xoffsets = { // if required: default is zero
+  "world1": 0, // primary offset (number of tiles) SE from centre (x)
+  //"world2": 0, // secondary offset (number of tiles) SE from centre (x)
+  "world2": -0.5, // tertiary offset (number of tiles) SE from centre (x)
+  // ... add more lines as required, separated by commas
+};
+
+// ## This is especially useful for large regions e.g. varregions ##
+var yoffsets = { // if required: default is zero
+  "world1": 0, // primary offset (number of tiles) SE from centre (y)
+  //"world2": 0, // secondary offset (number of tiles) SE from centre (y)
+  "world2": -0.5, // tertiary offset (number of tiles) SE from centre (y)
   // ... add more lines as required, separated by commas, same index labels as above
 };
 
 // initial zoom level (make sure 5 <= zoomStart <= 9): for small grids, try 8; for large grids, try 6
-zoomStart = 8;
+var zoomStart;
+var zoomStarts = {
+  "world1": 8, // primary zoom start level
+  //"world2": 8, // secondary zoom start level
+  "world2": 7, // tertiary zoom start level
+  // ... add more lines as required, separated by commas
+};
 
 var mapCentreNames = [ // these will appear on the map control buttons, e.g. names of worlds or arbitrary labels
   "Main", // primary map centre name of choice
@@ -33,8 +58,8 @@ var mapCentreNames = [ // these will appear on the map control buttons, e.g. nam
 ];
 
 var copyrightNotices = [ // these may be different for each map, e.g. if for multiple worlds
-  "Just testing", // primary copyright notice
-  "Still testing", // secondary copyright notice
+  "Testing 256x256", // primary copyright notice
+  "Testing 1024x1024", // secondary copyright notice
   // ... add more lines as required, separated by commas
 ];
 
@@ -49,6 +74,11 @@ var hgports = { // these may be different for each map, e.g. if for multiple wor
   "world2": "80", // secondary hypergrid port
   // ... add more lines as required, separated by commas
 };
+
+var port80 = 1; // Where default port 80 is specified, include explicitly in link (boolean).
+
+var copyrightStartYear = 2012;
+var copyrightEndYear = 0; // 0 = current year, -1 = no end year
 
 // ########## DON'T USUALLY CHANGE THIS ##########
 // This setting determines the names of the jpg files. They can be the UUIDs of the regions, or the format 
@@ -67,13 +97,22 @@ var showUUID = "false"; // Default is "false", setting to "true" will show the r
 var xstart = xlocations[defaultMap];
 var ystart = ylocations[defaultMap];
 
+var zoomStart = zoomStarts[defaultMap];
+
 // ## Set up variables for region location ##
 var xjump;
 var yjump;
 var __items;
 
+// ## Set up variables for region size ##
+var sizeX;
+var sizeY;
+var xsizes = new Array();
+var ysizes = new Array();
+
 // ## Set up variables for the map ##
 var map;
+
 var latLng = new google.maps.LatLng(11, 11);
 
 var mapTypes = new Array();
@@ -229,6 +268,15 @@ function load() {
     layerCount = 0; // restarts the count of overlay tiles
     xstart = xlocations[map.getMapTypeId()]; // gets the x location for the tiles
     ystart = ylocations[map.getMapTypeId()]; // gets the y location for the tiles
+    zoomStart = zoomStarts[map.getMapTypeId()]; // fetches the zoom start level for the map type
+    map.setZoom(zoomStart); // sets the zoom start level
+
+    // ## Offset the centre from xlocation, ylocation ##
+    var xoffset = xoffsets[map.getMapTypeId()];
+    var yoffset = yoffsets[map.getMapTypeId()];
+    map.setCenter(latLng);
+    map.panBy(-xoffset*184,yoffset*184); // Not sure why 184 pixels is right but it is!
+
     request = getHTTPObject();
     if(request){
       request.onreadystatechange = function(){
@@ -255,17 +303,37 @@ function load() {
     var y = clickLatLng.lat();
     //if(overlay){return;}
     //var x = point.lng();
+    // ## New code for getting varregion sizes ##
+    sizeX = ysizes[map.getMapTypeId()]; // gets the x size for the tiles
+    sizeY = ysizes[map.getMapTypeId()]; // gets the y size for the tiles
+    // ## End of new code ##
     xjump = Math.round(256 * (x - (x | 0)));
+    // ## Purpose of next line unclear?  ##
     if(x < 0) x--;		
     var str = x.toString();		
     str = str.substring(0, str.indexOf(".", 0));
     x = xstart - 10 + parseInt(str);
     //var y = point.lat();			
     yjump = Math.round(256 * (y - (y | 0)));
+    // ## Purpose of next line unclear?  ##
     if(y < 0) y--;	
     str = y.toString();
     str = str.substring(0, str.indexOf(".", 0));
     y = ystart - 10 + parseInt(str);
+    // ## New code for enabling varregions ##
+    var xbigger = (x-xstart);
+    var ybigger = (y-ystart);
+    var xtilebigger = (sizeX/256)-1;
+    var ytilebigger = (sizeY/256)-1;
+    if (xbigger > 0 && xbigger <= xtilebigger) {
+      xjump = xjump + (xbigger*256);
+      x = xstart;
+    }
+    if (ybigger > 0 && ybigger <= ytilebigger) {
+      yjump = yjump + (ybigger*256);
+      y = ystart;
+    }
+    // ## End of new code ##
     if(isOutOfBounds(x,y)){return;}
     //show info popup if a region exists
     var content = getRegionInfos(x,y);
@@ -362,36 +430,64 @@ function parseMapResponse(request,map){
       var root=data.getElementsByTagName('Map')[0];
       if(root==null){return;}
       __items=root.getElementsByTagName("Grid");	
+      //console.log(root); // FOR TESTING [opensim]/app/google_map/data/map.php ONLY
       if(__items==null){return;}
-      for(var i=0;i<__items.length;i++){		
+      for(var i=0;i<__items.length;i++){
         if(__items[i].nodeType == 1){
           var xmluuid=__items[i].getElementsByTagName("Uuid")[0].firstChild.nodeValue;
           var xmlregionname=__items[i].getElementsByTagName("RegionName")[0].firstChild.nodeValue;
           var xmllocX=__items[i].getElementsByTagName("LocX")[0].firstChild.nodeValue;
           var xmllocY=__items[i].getElementsByTagName("LocY")[0].firstChild.nodeValue;
-          var opensimFilename = 'map-1-' + xmllocX + '-' + xmllocY + '-objects'+ '.jpg';
+          // ## Rewritten code for getting varregion sizes ##
+          for (key in xlocations) {
+            if (xlocations[key] == xmllocX && ylocations[key] == xmllocY) {
+              xsizes[key] = __items[i].getElementsByTagName("SizeX")[0].firstChild.nodeValue;
+              ysizes[key] = __items[i].getElementsByTagName("SizeY")[0].firstChild.nodeValue;
+            }
+          }
+          sizeX = __items[i].getElementsByTagName("SizeX")[0].firstChild.nodeValue; 
+          sizeY = __items[i].getElementsByTagName("SizeY")[0].firstChild.nodeValue;
+          // ## End of new code - following old line left for information, moved below ##
+          //var opensimFilename = 'map-1-' + xmllocX + '-' + xmllocY + '-objects'+ '.jpg';
           xmllocX=xmllocX - xstart + 10;
           xmllocY=xmllocY - ystart + 10;
-          var boundaries = new google.maps.LatLngBounds(
-          new google.maps.LatLng(xmllocY,xmllocX),
-          new google.maps.LatLng(xmllocY+1,xmllocX+1));
-          if (filenames == "uuid-no-dashes") { // This is kept to enable compatibility with v2 code using UUIDs without dashes
-            var rx=new RegExp("(-)", "g");
-            xmluuid = xmluuid.replace(rx,"");
+          // ## New code for initialising varregions on map ##
+          for (var x=(sizeX/256)-1;x>=0;x--){ // has to be backwards to finish on SE corner
+            for (var y=(sizeX/256)-1;y>=0;y--){ // has to be backwards to finish on SE corner
+              var xmllocXx = parseInt(xmllocX) + x - 10 + xstart; var xmllocYy = parseInt(xmllocY) + y - 10 + ystart; // messy hack needs tidying later
+              var opensimFilename = 'map-1-' + xmllocXx + '-' + xmllocYy + '-objects'+ '.jpg';
+              // ## Old lines left for information ##
+              //var boundaries = new google.maps.LatLngBounds(
+                //new google.maps.LatLng(xmllocY,xmllocX),
+                //new google.maps.LatLng(xmllocY+1,xmllocX+1));
+              var boundaries = new google.maps.LatLngBounds(
+                new google.maps.LatLng(xmllocY+y,xmllocX+x),
+                new google.maps.LatLng(xmllocY+y+1,xmllocX+x+1));
+              if (filenames == "uuid-no-dashes") { // This is kept to enable compatibility with v2 code using UUIDs without dashes
+                var rx=new RegExp("(-)", "g");
+                xmluuid = xmluuid.replace(rx,"");
+              }
+              var groundOverlayOptions = {map: map, clickable: true, opacity: 0.65};
+              layerCount ++;
+              var groundoverlay;
+
+              if (filenames == "uuid" || filenames == "uuid-no-dashes") { // Use UUID format for jpg names
+                //layer[layerCount] = new google.maps.GroundOverlay('data/regions/' + xmluuid + '.jpg', boundaries, groundOverlayOptions);
+                groundoverlay = 'data/regions/' + xmluuid + '.jpg';
+              }
+              else if (filenames == "opensim") { // Use default opensim naming pattern for jpg names
+                //layer[layerCount] = new google.maps.GroundOverlay('data/regions/' + opensimFilename, boundaries, groundOverlayOptions);
+                groundoverlay = 'data/regions/' + opensimFilename;
+              }
+              layer[layerCount] = new google.maps.GroundOverlay(groundoverlay, boundaries, groundOverlayOptions);
+              layer[layerCount].setMap(map);
+              // ## Listener to divert click on map overlay tiles to map click (otherwise blocked) ##
+              google.maps.event.addListener(layer[layerCount], 'click', function(event) {
+                google.maps.event.trigger(map, 'click', event);
+              });
+              // ## End of rewritten code ##
+            }
           }
-          var groundOverlayOptions = {map: map, clickable: true, opacity: 0.65};
-          layerCount ++;
-          if (filenames == "uuid") { // Use UUID format for jpg names
-            layer[layerCount] = new google.maps.GroundOverlay('data/regions/' + xmluuid + '.jpg', boundaries, groundOverlayOptions);
-          }
-          else if (filenames == "opensim") { // Use default opensim naming pattern for jpg names
-            layer[layerCount] = new google.maps.GroundOverlay('data/regions/' + opensimFilename, boundaries, groundOverlayOptions);
-          }
-          layer[layerCount].setMap(map);
-          // ## Listener to divert click on map overlay tiles to map click (otherwise blocked) ##
-          google.maps.event.addListener(layer[layerCount], 'click', function(event) {
-            google.maps.event.trigger(map, 'click', event);
-          });
         }
       }	
     }
@@ -420,11 +516,17 @@ function getRegionInfos(x,y){
           marker.setTitle("Location: "+xmlregionname+"/"+xjump+"/"+yjump+"/");
         }
         response+="<tr><td><span id='loc'>" + "(" + xmllocX + ", " + xmllocY + ")" + "</span></td></tr>";
-        response+="<tr><td><a class=\"add\" href=\"secondlife://"+hgdomains[map.getMapTypeId()]+":"+hgports[map.getMapTypeId()]+":"+xmlregionname+"/"+xjump+"/"+yjump+"/\">Hypergrid</a>&nbsp;&nbsp;</td>";
+        var portnumber = hgports[map.getMapTypeId()];
+        var portstring = "";
+        var portstring2 = "";
+        if (port80 == 1) {portstring = ":"+portnumber; portstring2 = "|"+portnumber;}
+        response+="<tr><td><a class=\"add\" href=\"secondlife://"+hgdomains[map.getMapTypeId()]+portstring+":"+xmlregionname+"/"+xjump+"/"+yjump+"/\">Hypergrid</a>&nbsp;&nbsp;</td>";
         xmlregionname = xmlregionname.replace(" ","+"); // fix for V3 HG URL
-        response+="<td><a class=\"add\" href=\"secondlife://http|!!"+hgdomains[map.getMapTypeId()]+"|"+hgports[map.getMapTypeId()]+"+"+xmlregionname+"\">V3 HG</a>&nbsp;&nbsp;</td>";
+        response+="<td><a class=\"add\" href=\"secondlife://http|!!"+hgdomains[map.getMapTypeId()]+portstring+"+"+xmlregionname+"\">V3 HG</a>&nbsp;&nbsp;</td>";
         xmlregionname = xmlregionname.replace("+"," "); // change back for local URL
         response+="<td><a class=\"add\" href=\"secondlife://"+xmlregionname+"/"+xjump+"/"+yjump+"/\">Local</a></td></tr>";
+        if (xjump > 255 || yjump > 255) {response+="</table><table><tr><td>Viewer may restrict login within SE 256x256 corner </td></tr><tr><td>of larger regions in OpenSim/WhiteCore/Aurora</td></tr>";}
+        response+="</table>";
       }
     }	
   }	
@@ -485,9 +587,16 @@ function updateCopyrights() {
 // #### Function to load copyright collections for custom map types ####
 function loadCopyrightCollections(mapTypesCount) {
   var collection = new Array();
+  if (copyrightEndYear == 0){
+    copyrightEndYear = String(new Date().getFullYear()).substr(2)
+  }
+  var copyrightEndYearString = "";
+  if (copyrightEndYear != -1) {
+    copyrightEndYearString = "-"+copyrightEndYear.toString();
+  }
   for (i = 0; i < mapTypesCount; ++i) {
     //map.mapTypes.set(mapTypes[i], new plainMapType(mapCentreNames[i]));
-    collection[i] = new CopyrightCollection('Map data &copy;2012');
+    collection[i] = new CopyrightCollection('Map data &copy;2012'+copyrightEndYearString);
     collection[i].addCopyright(new Copyright(   
     1,
     new google.maps.LatLngBounds(
@@ -527,6 +636,10 @@ function HomeControl(controlDiv, map) {
 
   // ## Set up the click event listeners ##
   google.maps.event.addDomListener(controlUI, 'click', function() {
-    map.setCenter(latLng)
+    // ## New code to offset the centre from xlocation, ylocation ##
+    var xoffset = xoffsets[map.getMapTypeId()];
+    var yoffset = yoffsets[map.getMapTypeId()];
+    map.setCenter(latLng);
+    map.panBy(-xoffset*184,yoffset*184); // Not sure why 184 pixels is right but it is!
   });
 }
