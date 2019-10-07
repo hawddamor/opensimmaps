@@ -15,7 +15,7 @@ easier and much to be preferred. It should work fine for multiple grids too. Ess
 
 There are several other things you can do to improve how this works with your OpenSim instance.
 
-(2) Use the module Warp3DImageModule rather than MapImageModule. You actually need these settings under [Startup] in OpenSim.ini (as of 
+(1) Use the module Warp3DImageModule rather than MapImageModule. You actually need these settings under [Startup] in OpenSim.ini (as of 
 OpenSim 0.7.3.1) - the quotation marks may or may not be critical. Some may already be set in OpenSimDefaults.ini, which you should NOT 
 change. If you wish to change settings, copy the lines to the correct sections in OpenSim.ini and change them there:
 
@@ -29,7 +29,7 @@ This will dramatically improve the quality of your map tiles but some people hav
 is likely that this will depend on the specifications of your server. Check the OpenSim Mantis (http://opensimulator.org/mantis/main_page.php) 
 if you have a problem, as someone else may have had it before and you shouldn't duplicate error reports. Likely they are working on it :-)
 
-(3) Notice that, unlike the previous version, you can add multiple map centres (see the settings in url.js), which can even be on different 
+(2) Notice that, unlike the previous version, you can add multiple map centres (see the settings in url.js), which can even be on different 
 servers, providing of course that you have local copies of maptiles or can fetch them somehow from any remote servers when you need to (for 
 example, it would be possible to do this automatically using scp or similar if you needed to script this for a large grid, updating at 
 intervals using a cron job, for example, on a Linux/Unix/Solaris server). You should be able to have quite a lot, if you *really* need to! ;-)
