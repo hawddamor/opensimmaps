@@ -22,10 +22,12 @@ Added offsets from map centre
 Improved home centering per map centre
 Added zoom levels for each  map centre
 Added automatic copyright start/end years
+Provided easier mechanism of getting maptiles automatically from the server rather than requiring symbolic links, with setting option to revert to the old method.
+
 
 To do (features):
 add switchable grid map background with grid locations (& sort out how background is done)
 move set up user settings into XML and use parser to initialise
 
-Code base last modified: 2014-07-12
-This change log last modified: 2014-07-13
+Code base last modified: 2019-10-07
+This change log last modified: 2019-10-07
