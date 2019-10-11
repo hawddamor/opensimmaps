@@ -481,7 +481,7 @@ function parseMapResponse(request,map){
               }
               else if (filenames == "opensim-from-server") { // Use default opensim naming pattern for jpg names
                 //layer[layerCount] = new google.maps.GroundOverlay('data/regions/' + opensimFilename, boundaries, groundOverlayOptions);
-                groundoverlay = groundoverlay = location.protocol + '//' + hgdomains[map.getMapTypeId()] + ':' + hgports[map.getMapTypeId()] + '/' + opensimFilename;
+                groundoverlay = groundoverlay = 'http://' + hgdomains[map.getMapTypeId()] + ':' + hgports[map.getMapTypeId()] + '/' + opensimFilename;
               }
               layer[layerCount] = new google.maps.GroundOverlay(groundoverlay, boundaries, groundOverlayOptions);
               layer[layerCount].setMap(map);
