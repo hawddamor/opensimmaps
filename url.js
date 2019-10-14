@@ -85,7 +85,7 @@ var copyrightEndYear = 0; // 0 = current year, -1 = no end year
 // used in [opensim]/bin/maptiles or, though not sure you'd want this, UUIDs with dashes removed. This is left 
 // in to enable compatibility with the v2 code but it is better to use the proper UUID format with dashes retained.
 
-var filenames = "opensim"; // default is "opensim", otherwise use "uuid" or "uuid-no-dashes"var filenames = "opensim-from-server"; // default is "opensim-from-server", otherwise use "opensim--from-files", "uuid" or "uuid-no-dashes"
+var filenames = "from-files"; // default is "from-files", otherwise use "from-server", "uuid" or "uuid-no-dashes"
 
 var showUUID = "false"; // Default is "false", setting to "true" will show the region UUID in the infoWindow
 
@@ -475,11 +475,11 @@ function parseMapResponse(request,map){
                 //layer[layerCount] = new google.maps.GroundOverlay('data/regions/' + xmluuid + '.jpg', boundaries, groundOverlayOptions);
                 groundoverlay = 'data/regions/' + xmluuid + '.jpg';
               }
-              else if (filenames == "opensim-from-files") { // Use default opensim naming pattern for jpg names
+              else if (filenames == "from-files") { // Use default opensim naming pattern for jpg names
                 //layer[layerCount] = new google.maps.GroundOverlay('data/regions/' + opensimFilename, boundaries, groundOverlayOptions);
                 groundoverlay = 'data/regions/' + opensimFilename;
               }
-              else if (filenames == "opensim-from-server") { // Use default opensim naming pattern for jpg names
+              else if (filenames == "from-server") { // Use default opensim naming pattern for jpg names
                 //layer[layerCount] = new google.maps.GroundOverlay('data/regions/' + opensimFilename, boundaries, groundOverlayOptions);
                 groundoverlay = groundoverlay = 'http://' + hgdomains[map.getMapTypeId()] + ':' + hgports[map.getMapTypeId()] + '/' + opensimFilename;
               }
