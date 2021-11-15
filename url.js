@@ -392,9 +392,9 @@ function placeMarker(location) {
   }
 
   // ## Listener to remove marker when dragged - in hindsight, this should be left in ##
-  google.maps.event.addListenerOnce(marker, 'dragstart', function() {
+  //google.maps.event.addListenerOnce(marker, 'dragstart', function() {
     //infoWindow.close();
-  });
+  //});
 
   // ## THIS GLUES THE MARKER TO THE MOUSE: DON'T USE HERE (LEFT IN FOR INFO!) ##
   //google.maps.event.addListenerOnce(marker, 'drag', function() {
