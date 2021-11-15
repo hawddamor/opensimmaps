@@ -3,7 +3,7 @@
  	<head>
    		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     	<title>World Map</title>
-		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&v=3&key=AIzaSyBACCLjQjfliUdoyI90ZS5HNf7M22TYORI"></script>
+		<script type="text/javascript" src="http://maps.google.com/maps/api/js?v=3&key=AIzaSyBACCLjQjfliUdoyI90ZS5HNf7M22TYORI"></script>
     	<script type="text/javascript" src="url.js"></script>
         <script type="text/javascript" src="copyright.js"></script>
     	<link rel="stylesheet" type="text/css" href="style.css" />
