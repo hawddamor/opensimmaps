@@ -310,16 +310,12 @@ function load() {
     xjump = Math.round(256 * (x - (x | 0)));
     // ## Purpose of next line unclear?  ##
     if(x < 0) x--;		
-    var str = x.toString();		
-    str = str.substring(0, str.indexOf(".", 0));
-    x = xstart - 10 + parseInt(str);
+    x = xstart - 10 + Math.floor(x);
     //var y = point.lat();			
     yjump = Math.round(256 * (y - (y | 0)));
     // ## Purpose of next line unclear?  ##
     if(y < 0) y--;	
-    str = y.toString();
-    str = str.substring(0, str.indexOf(".", 0));
-    y = ystart - 10 + parseInt(str);
+    y = ystart - 10 + Math.floor(y);
     // ## New code for enabling varregions ##
     var xbigger = (x-xstart);
     var ybigger = (y-ystart);
@@ -395,9 +391,9 @@ function placeMarker(location) {
     marker.setMap(map);
   }
 
-  // ## Listener to remove marker when dragged ##
+  // ## Listener to remove marker when dragged - in hindsight, this should be left in ##
   google.maps.event.addListenerOnce(marker, 'dragstart', function() {
-    infoWindow.close();
+    //infoWindow.close();
   });
 
   // ## THIS GLUES THE MARKER TO THE MOUSE: DON'T USE HERE (LEFT IN FOR INFO!) ##
